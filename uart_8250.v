@@ -15,8 +15,8 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     wire [3:0] offset = ADR_I[3:0];
 
     
-    reg [7:0] rx_buffer;
-    reg [7:0] tx_buffer;
+    reg [7:0] RHR; /* Receive FIFO output */
+    reg [7:0] THR; /* Transmit FIFO input */
     reg [7:0] IER; /* Interrupt Enable Register */
     reg [7:0] IIR; /* Interrupt ID Register */
     reg [7:0] FCR; /* FIFO Control Register */
@@ -30,7 +30,16 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             
         end
         else begin
-            
+            case (offset)
+                4'h0: begin
+
+                end
+                default: begin
+                    DAT_O <= 32'bz;
+                    ACK_O <= 1'bz;
+                    INT_O <= 1'b0;
+                end
+            endcase
         end
     end
     
