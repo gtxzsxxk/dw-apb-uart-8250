@@ -9,12 +9,12 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                   output reg ACK_O,        /* 操作成功结束 */
                   input CYC_I,             /* 总线周期信号 */
                   output reg INT_O);       /* 中断信号 */
-
+    
     parameter base_addr = 32'h1250_0000;
     parameter FIFO_SIZE = 8'd32;
-    wire valid_addr = ADR_I[31:4] == base_addr[31:4];
-    wire [3:0] offset = ADR_I[3:0];
-
+    wire valid_addr     = ADR_I[31:4] == base_addr[31:4];
+    wire [3:0] offset   = ADR_I[3:0];
+    
     
     reg [7:0] RHR; /* Receive FIFO output */
     reg [7:0] IER; /* Interrupt Enable Register */
@@ -24,7 +24,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     reg [7:0] MCR; /* Modem Control Register */
     reg [7:0] LSR; /* Line Status Register */
     reg [7:0] MSR; /* Modem Status Register */
-
+    
     reg [7:0] tx_fifo [FIFO_SIZE];
     reg [7:0] tx_fifo_head;
     reg [7:0] tx_fifo_tail;
@@ -42,7 +42,12 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             MCR <= 8'b0;
             LSR <= 8'b0; /* 不应该放在这里 */
             MSR <= 8'b0; /* 不应该放在这里 */
-
+            
+            tx_fifo_head <= 0;
+            tx_fifo_tail <= 0;
+            rx_fifo_head <= 0;
+            rx_fifo_tail <= 0;
+            
             DAT_O <= 32'bz;
             ACK_O <= 1'bz;
             INT_O <= 1'b0;
@@ -50,12 +55,79 @@ module uart_8250 (input CLK_I,             /* 时钟 */
         else begin
             case (offset)
                 4'h0: begin
-                    if(WE_I) begin
+                    if (WE_I) begin
                         /* TODO: 添加进fifo */
                         DAT_O <= 32'bz;
                     end
                     else begin
                         DAT_O <= {24'b0, RHR};
+                    end
+                    ACK_O <= 1'b1;
+                    INT_O <= 1'b0;
+                end
+                4'h1: begin
+                    if (WE_I) begin
+                        IER   <= DAT_I[7:0];
+                        DAT_O <= 32'bz;
+                    end
+                    else begin
+                        DAT_O <= {24'b0, IER};
+                    end
+                    ACK_O <= 1'b1;
+                    INT_O <= 1'b0;
+                end
+                4'h2: begin
+                    /* Write: FIFO Control */
+                    /* Read: Get Interrupt Information */
+                    if (WE_I) begin
+                        FCR   <= DAT_I[7:0];
+                        DAT_O <= 32'bz;
+                    end
+                    else begin
+                        DAT_O <= {24'b0, IIR};
+                    end
+                    ACK_O <= 1'b1;
+                    INT_O <= 1'b0;
+                end
+                4'h3: begin
+                    /* Line Control Register */
+                    if (WE_I) begin
+                        LCR   <= DAT_I[7:0];
+                        DAT_O <= 32'bz;
+                    end
+                    else begin
+                        DAT_O <= {24'b0, LCR};
+                    end
+                    ACK_O <= 1'b1;
+                    INT_O <= 1'b0;
+                end
+                4'h4: begin
+                    /* Modem Control Write Only */
+                    if (WE_I) begin
+                        LCR <= DAT_I[7:0];
+                    end
+                    DAT_O <= 32'bz;
+                    ACK_O <= 1'b1;
+                    INT_O <= 1'b0;
+                end
+                4'h5: begin
+                    /* Line Status Read Only */
+                    if (!WE_I) begin
+                        DAT_O <= {24'b0, LSR};
+                    end
+                    else begin
+                        DAT_O <= 32'bz;
+                    end
+                    ACK_O <= 1'b1;
+                    INT_O <= 1'b0;
+                end
+                4'h6: begin
+                    /* Line Status Read Only */
+                    if (!WE_I) begin
+                        DAT_O <= {24'b0, MSR};
+                    end
+                    else begin
+                        DAT_O <= 32'bz;
                     end
                     ACK_O <= 1'b1;
                     INT_O <= 1'b0;
