@@ -7,11 +7,12 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                   input [3:0] SEL_I,       /* 字节选择信号 */
                   input STB_I,             /* 选通信号 */
                   output reg ACK_O,        /* 操作成功结束 */
-                  input CYC_I);            /* 总线周期信号 */
+                  input CYC_I,             /* 总线周期信号 */
+                  output reg INT_O);       /* 中断信号 */
     
-    always @(posedge CLK_I or negedge RST_I) begin
+    always @(posedge CYC_I or negedge RST_I) begin
         if (!RST_I) begin
-            /* 复位 */
+            
         end
         else begin
             
