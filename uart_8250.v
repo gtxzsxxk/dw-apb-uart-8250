@@ -32,7 +32,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     reg [7:0] rx_fifo_head;
     reg [7:0] rx_fifo_tail;
     
-    reg [15:0] clock_divisor; /* 0时2分频，1时4分频，2时6分频 */
+    reg [15:0] clock_divisor; /* 0时2分频，1时2分频，2时4分频，3时6分频 */
     
     reg [15:0] clock_div_cnt;
     
@@ -169,7 +169,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             end
             
             /* clock division */
-            if (clock_div_cnt >= clock_divisor) begin
+            if (clock_div_cnt >= (clock_divisor - 1) || clock_divisor == 0) begin
                 clock_div_cnt <= 0;
                 divided_clk   <= ~ divided_clk;
             end

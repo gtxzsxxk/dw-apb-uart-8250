@@ -93,12 +93,61 @@ module uart_8250_tst();
         // #1 CLK_O = 0;
         
         /* Test of writing divisor latch */
+
+        /* 此时应该为2分频 */
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
         
         #1 ADR_O = 32'h1250_0003;
         DAT_O    = 32'b1000_0000;
         WE_O     = 1;
         STB_O    = 1;
         CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+
+        #1 ADR_O = 32'h1250_0000;
+        DAT_O    = 32'b0000_0001;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 ADR_O = 32'h1250_0001;
+        DAT_O    = 32'b0000_0000;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+
+        /* 2分频 */
+        
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
         #1 CLK_O = 1;
         #1 CLK_O = 0;
         
@@ -125,6 +174,8 @@ module uart_8250_tst();
         CYC_O    = 1;
         #1 CLK_O = 1;
         #1 CLK_O = 0;
+
+        /* 4分频 */
         
         #1 CLK_O = 1;
         #1 CLK_O = 0;
@@ -150,7 +201,25 @@ module uart_8250_tst();
         CYC_O    = 1;
         #1 CLK_O = 1;
         #1 CLK_O = 0;
+
+        /* 6分频 */
         
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
         #1 CLK_O = 1;
         #1 CLK_O = 0;
         #1 CLK_O = 1;
