@@ -9,6 +9,11 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                   output reg ACK_O,        /* 操作成功结束 */
                   input CYC_I,             /* 总线周期信号 */
                   output reg INT_O);       /* 中断信号 */
+
+    parameter base_addr = 32'h1250_0000;
+    wire valid_addr = ADR_I[31:4] == base_addr[31:4];
+    wire [3:0] offset = ADR_I[3:0];
+
     
     reg [7:0] rx_buffer;
     reg [7:0] tx_buffer;
@@ -25,11 +30,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             
         end
         else begin
-            if (WE_I) begin
-                
-            end
-            else begin
-            end
+            
         end
     end
     
