@@ -17,7 +17,6 @@ module uart_8250 (input CLK_I,             /* 时钟 */
 
     
     reg [7:0] RHR; /* Receive FIFO output */
-    reg [7:0] THR; /* Transmit FIFO input */
     reg [7:0] IER; /* Interrupt Enable Register */
     reg [7:0] IIR; /* Interrupt ID Register */
     reg [7:0] FCR; /* FIFO Control Register */
@@ -27,17 +26,32 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     reg [7:0] MSR; /* Modem Status Register */
 
     reg [7:0] tx_fifo [FIFO_SIZE];
+    reg [7:0] tx_fifo_head;
+    reg [7:0] tx_fifo_tail;
     reg [7:0] rx_fifo [FIFO_SIZE];
+    reg [7:0] rx_fifo_head;
+    reg [7:0] rx_fifo_tail;
     
     always @(posedge CYC_I or negedge RST_I) begin
         if (!RST_I) begin
-            
+            RHR <= 8'b0;
+            IER <= 8'h0;
+            IIR <= 8'hc1;
+            FCR <= 8'b1100_0000;
+            LCR <= 8'b0000_0011;
+            MCR <= 8'b0;
+            LSR <= 8'b0; /* 不应该放在这里 */
+            MSR <= 8'b0; /* 不应该放在这里 */
+
+            DAT_O <= 32'bz;
+            ACK_O <= 1'bz;
+            INT_O <= 1'b0;
         end
         else begin
             case (offset)
                 4'h0: begin
                     if(WE_I) begin
-                        THR <= DAT_I[7:0];
+                        /* TODO: 添加进fifo */
                         DAT_O <= 32'bz;
                     end
                     else begin
