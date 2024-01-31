@@ -31,11 +31,11 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     reg [7:0] rx_fifo [FIFO_SIZE];
     reg [7:0] rx_fifo_head;
     reg [7:0] rx_fifo_tail;
-
+    
     reg [15:0] clock_divisor; /* 0时2分频，1时4分频，2时6分频 */
-
+    
     reg [15:0] clock_div_cnt;
-
+    
     reg divided_clk;
     
     always @(posedge CLK_I or negedge RST_I) begin
@@ -53,10 +53,10 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             tx_fifo_tail <= 0;
             rx_fifo_head <= 0;
             rx_fifo_tail <= 0;
-
+            
             clock_divisor <= 0;
             clock_div_cnt <= 0;
-            divided_clk <= 0;
+            divided_clk   <= 0;
             
             DAT_O <= 32'bz;
             ACK_O <= 1'bz;
@@ -67,7 +67,13 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                 case (offset)
                     4'h0: begin
                         if (WE_I) begin
-                            /* TODO: 添加进fifo */
+                            if (LCR[7]) begin
+                                /* LSB of clock_divisor */
+                                clock_divisor[7:0] <= DAT_I[7:0];
+                            end
+                            else begin
+                                /* TODO: 添加进fifo */
+                            end
                             DAT_O <= 32'bz;
                         end
                         else begin
@@ -78,7 +84,13 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                     end
                     4'h1: begin
                         if (WE_I) begin
-                            IER   <= DAT_I[7:0];
+                            if (LCR[7]) begin
+                                /* MSB of clock_divisor */
+                                clock_divisor[15:8] <= DAT_I[7:0];
+                            end
+                            else begin
+                                IER <= DAT_I[7:0];
+                            end
                             DAT_O <= 32'bz;
                         end
                         else begin
@@ -155,11 +167,11 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                 ACK_O <= 1'bz;
                 INT_O <= 1'b0;
             end
-
+            
             /* clock division */
-            if(clock_div_cnt >= clock_divisor) begin
+            if (clock_div_cnt >= clock_divisor) begin
                 clock_div_cnt <= 0;
-                divided_clk <= ~ divided_clk;
+                divided_clk   <= ~ divided_clk;
             end
             else begin
                 clock_div_cnt <= clock_div_cnt + 1;

@@ -52,43 +52,119 @@ module uart_8250_tst();
         // #1 ADR_O = 32'hf250_0005;
         
         /* register read and write */
-        ADR_O    = 32'h1250_0001;
-        DAT_O    = 32'b0001_1101;
-        WE_O     = 1;
-        STB_O    = 1;
-        CYC_O    = 1;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
+        // ADR_O    = 32'h1250_0001;
+        // DAT_O    = 32'b0001_1101;
+        // WE_O     = 1;
+        // STB_O    = 1;
+        // CYC_O    = 1;
+        // #1 CLK_O = 1;
+        // #1 CLK_O = 0;
         
-        #1 ADR_O = 32'h1250_0002;
-        DAT_O    = 32'b1001_0001;
-        WE_O     = 1;
-        STB_O    = 1;
-        CYC_O    = 1;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
+        // #1 ADR_O = 32'h1250_0002;
+        // DAT_O    = 32'b1001_0001;
+        // WE_O     = 1;
+        // STB_O    = 1;
+        // CYC_O    = 1;
+        // #1 CLK_O = 1;
+        // #1 CLK_O = 0;
         
-        #1 ADR_O = 32'h1250_0002;
+        // #1 ADR_O = 32'h1250_0002;
         
-        WE_O     = 0;
-        STB_O    = 1;
-        CYC_O    = 1;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
+        // WE_O     = 0;
+        // STB_O    = 1;
+        // CYC_O    = 1;
+        // #1 CLK_O = 1;
+        // #1 CLK_O = 0;
+        
+        // #1 ADR_O = 32'h1250_0003;
+        // DAT_O    = 32'b1010_1101;
+        // WE_O     = 1;
+        // STB_O    = 1;
+        // CYC_O    = 1;
+        // #1 CLK_O = 1;
+        // #1 CLK_O = 0;
+        
+        // #1 ADR_O = 32'h1250_0003;
+        
+        // WE_O     = 0;
+        // STB_O    = 1;
+        // CYC_O    = 1;
+        // #1 CLK_O = 1;
+        // #1 CLK_O = 0;
+        
+        /* Test of writing divisor latch */
         
         #1 ADR_O = 32'h1250_0003;
-        DAT_O    = 32'b1010_1101;
+        DAT_O    = 32'b1000_0000;
         WE_O     = 1;
         STB_O    = 1;
         CYC_O    = 1;
         #1 CLK_O = 1;
         #1 CLK_O = 0;
         
-        #1 ADR_O = 32'h1250_0003;
-        
-        WE_O     = 0;
+        #1 ADR_O = 32'h1250_0000;
+        DAT_O    = 32'b0000_0010;
+        WE_O     = 1;
         STB_O    = 1;
         CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 ADR_O = 32'h1250_0001;
+        DAT_O    = 32'b0010_0000;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 ADR_O = 32'h1250_0001;
+        DAT_O    = 32'b0000_0000;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 ADR_O = 32'h1250_0000;
+        DAT_O    = 32'b0000_0011;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
         #1 CLK_O = 1;
         #1 CLK_O = 0;
         
