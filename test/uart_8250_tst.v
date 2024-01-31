@@ -37,15 +37,18 @@ module uart_8250_tst();
     
     initial
     begin
+        /* address validation */
         ADR_O <= 32'h1250_0000;
         #1 ADR_O <= 32'h1250_0001;
         #1 ADR_O <= 32'h1250_0002;
         #1 ADR_O <= 32'h1250_0003;
         #1 ADR_O <= 32'h1250_0010;
         #1 ADR_O <= 32'h1250_00a0;
-        #1 ADR_O <= 32'h1256_0000;
+        #1 ADR_O <= 32'h1256_0002;
         #1 ADR_O <= 32'h0250_0000;
-        #1 ADR_O <= 32'hf250_0000;
+        #1 ADR_O <= 32'hf250_0005;
+
+        
         
         #1 $finish;
     end
