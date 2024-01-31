@@ -37,18 +37,60 @@ module uart_8250_tst();
     
     initial
     begin
+        RST_O    = 0;
+        CYC_O    = 0;
+        #1 RST_O = 1;
         /* address validation */
-        ADR_O <= 32'h1250_0000;
-        #1 ADR_O <= 32'h1250_0001;
-        #1 ADR_O <= 32'h1250_0002;
-        #1 ADR_O <= 32'h1250_0003;
-        #1 ADR_O <= 32'h1250_0010;
-        #1 ADR_O <= 32'h1250_00a0;
-        #1 ADR_O <= 32'h1256_0002;
-        #1 ADR_O <= 32'h0250_0000;
-        #1 ADR_O <= 32'hf250_0005;
-
+        // ADR_O    = 32'h1250_0000;
+        // #1 ADR_O = 32'h1250_0001;
+        // #1 ADR_O = 32'h1250_0002;
+        // #1 ADR_O = 32'h1250_0003;
+        // #1 ADR_O = 32'h1250_0010;
+        // #1 ADR_O = 32'h1250_00a0;
+        // #1 ADR_O = 32'h1256_0002;
+        // #1 ADR_O = 32'h0250_0000;
+        // #1 ADR_O = 32'hf250_0005;
         
+        /* register read and write */
+        ADR_O    = 32'h1250_0001;
+        DAT_O    = 32'b0001_1101;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 ADR_O = 32'h1250_0002;
+        DAT_O    = 32'b1001_0001;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 ADR_O = 32'h1250_0002;
+        
+        WE_O     = 0;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 ADR_O = 32'h1250_0003;
+        DAT_O    = 32'b1010_1101;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+        
+        #1 ADR_O = 32'h1250_0003;
+        
+        WE_O     = 0;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
         
         #1 $finish;
     end
