@@ -11,6 +11,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                   output reg INT_O);       /* 中断信号 */
 
     parameter base_addr = 32'h1250_0000;
+    parameter FIFO_SIZE = 8'd32;
     wire valid_addr = ADR_I[31:4] == base_addr[31:4];
     wire [3:0] offset = ADR_I[3:0];
 
@@ -24,6 +25,9 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     reg [7:0] MCR; /* Modem Control Register */
     reg [7:0] LSR; /* Line Status Register */
     reg [7:0] MSR; /* Modem Status Register */
+
+    reg [7:0] tx_fifo [FIFO_SIZE];
+    reg [7:0] rx_fifo [FIFO_SIZE];
     
     always @(posedge CYC_I or negedge RST_I) begin
         if (!RST_I) begin
@@ -32,7 +36,15 @@ module uart_8250 (input CLK_I,             /* 时钟 */
         else begin
             case (offset)
                 4'h0: begin
-
+                    if(WE_I) begin
+                        THR <= DAT_I[7:0];
+                        DAT_O <= 32'bz;
+                    end
+                    else begin
+                        DAT_O <= {24'b0, RHR};
+                    end
+                    ACK_O <= 1'b1;
+                    INT_O <= 1'b0;
                 end
                 default: begin
                     DAT_O <= 32'bz;
