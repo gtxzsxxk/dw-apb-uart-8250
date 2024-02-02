@@ -8,7 +8,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                   input STB_I,             /* 选通信号 */
                   output reg ACK_O,        /* 操作成功结束 */
                   input CYC_I,             /* 总线周期信号 */
-                  output reg INT_O,
+                  output INT_O,
                   output reg TX_O);       /* 中断信号 */
     
     parameter base_addr = 32'h1250_0000;
@@ -18,8 +18,9 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     
     
     reg [7:0] RHR; /* Receive FIFO output */
+    reg [7:0] THR;
     reg [7:0] IER; /* Interrupt Enable Register */
-    reg [7:0] IIR; /* Interrupt ID Register */
+    wire [3:0] IIR; /* Interrupt ID Register */
     reg [7:0] FCR; /* FIFO Control Register */
     reg [7:0] LCR; /* Line Control Register */
     reg [7:0] MCR; /* Modem Control Register */
@@ -43,12 +44,30 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     reg [15:0] clock_div_cnt;
     
     reg divided_clk;
+
+    reg intr_rev_line_status;
+    reg intr_rev_data_available;
+    reg intr_timeout_ind;
+    reg intr_tx_fifo_empty;
+    reg intr_modem_status;
+
+    assign INT_O = intr_rev_line_status | intr_rev_data_available
+        | intr_timeout_ind | intr_tx_fifo_empty | intr_modem_status;
+
+    assign IIR = {intr_rev_line_status ? 3'b011 : (
+        intr_rev_data_available ? 3'b010 : (
+            intr_timeout_ind ? 3'b110 : (
+                intr_tx_fifo_empty ? 3'b001: (
+                    intr_modem_status ? 3'b000 : 3'b111
+                )
+            )
+        )
+    ) , ~INT_O};
     
     always @(posedge CLK_I or negedge RST_I) begin
         if (!RST_I) begin
             RHR <= 8'b0;
             IER <= 8'h0;
-            IIR <= 8'hc1;
             FCR <= 8'b1100_0000;
             LCR <= 8'b0000_0011;
             MCR <= 8'b0;
@@ -69,7 +88,12 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             
             DAT_O <= 32'bz;
             ACK_O <= 1'bz;
-            INT_O <= 1'b0;
+
+            intr_rev_line_status <= 0;
+            intr_rev_data_available <= 0;
+            intr_timeout_ind <= 0;
+            intr_tx_fifo_empty <= 0;
+            intr_modem_status <= 0;
         end
         else begin
             if (STB_I && CYC_I) begin
@@ -81,7 +105,6 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                                 clock_divisor[7:0] <= DAT_I[7:0];
                             end
                             else begin
-                                /* TODO: 添加进fifo */
                                 if(tx_fifo_tail == FIFO_SIZE - 1) begin
                                     /* FIFO已经满了 */
                                     tx_fifo_head <= 0;
@@ -92,6 +115,8 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                                     tx_fifo[tx_fifo_tail] <= DAT_I[7:0];
                                     tx_fifo_tail <= tx_fifo_tail + 1;
                                 end
+                                LSR[5] <= 0;
+                                intr_tx_fifo_empty <= 0;
                             end
                             DAT_O <= 32'bz;
                         end
@@ -99,7 +124,6 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                             DAT_O <= {24'b0, RHR};
                         end
                         ACK_O <= 1'b1;
-                        INT_O <= 1'b0;
                     end
                     4'h1: begin
                         if (WE_I) begin
@@ -116,7 +140,6 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                             DAT_O <= {24'b0, IER};
                         end
                         ACK_O <= 1'b1;
-                        INT_O <= 1'b0;
                     end
                     4'h2: begin
                         /* Write: FIFO Control */
@@ -126,10 +149,10 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                             DAT_O <= 32'bz;
                         end
                         else begin
-                            DAT_O <= {24'b0, IIR};
+                            DAT_O <= {24'b0, 4'b1100, IIR};
+                            intr_tx_fifo_empty <= 0;
                         end
                         ACK_O <= 1'b1;
-                        INT_O <= 1'b0;
                     end
                     4'h3: begin
                         /* Line Control Register */
@@ -141,7 +164,6 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                             DAT_O <= {24'b0, LCR};
                         end
                         ACK_O <= 1'b1;
-                        INT_O <= 1'b0;
                     end
                     4'h4: begin
                         /* Modem Control Write Only */
@@ -150,7 +172,6 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                         end
                         DAT_O <= 32'bz;
                         ACK_O <= 1'b1;
-                        INT_O <= 1'b0;
                     end
                     4'h5: begin
                         /* Line Status Read Only */
@@ -161,7 +182,6 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                             DAT_O <= 32'bz;
                         end
                         ACK_O <= 1'b1;
-                        INT_O <= 1'b0;
                     end
                     4'h6: begin
                         /* Line Status Read Only */
@@ -172,19 +192,16 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                             DAT_O <= 32'bz;
                         end
                         ACK_O <= 1'b1;
-                        INT_O <= 1'b0;
                     end
                     default: begin
                         DAT_O <= 32'bz;
                         ACK_O <= 1'bz;
-                        INT_O <= 1'b0;
                     end
                 endcase
             end
             else begin
                 DAT_O <= 32'bz;
                 ACK_O <= 1'bz;
-                INT_O <= 1'b0;
             end
             
             /* clock division */
@@ -212,7 +229,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                 /* fifo非空 */
                 LSR[5] <= 0;
                 if(tx_completed_flag && !tx_shift_ready_flag) begin
-                    tx_shifting <= tx_fifo[tx_fifo_head];
+                    THR <= tx_fifo[tx_fifo_head];
                     tx_fifo_head <= tx_fifo_head + 1;
                     tx_shift_ready_flag <= 1;
                 end
@@ -221,15 +238,19 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                 end
             end
             else begin
-                LSR[5] <= 1;
                 tx_shift_ready_flag <= 0;
                 if (tx_fifo_tail > 0 && tx_fifo_head > 0) begin
                     tx_fifo_head <= 0;
                     tx_fifo_tail <= 0;
+                    LSR[5] <= 1;
+                    intr_tx_fifo_empty <= 1;
+                end
+                else begin
+                    LSR[5] <= 0;
+                    intr_tx_fifo_empty <= 0;
                 end
             end
 
-            
             
         end
     end
