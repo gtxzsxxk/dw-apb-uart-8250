@@ -8,7 +8,8 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                   input STB_I,             /* 选通信号 */
                   output reg ACK_O,        /* 操作成功结束 */
                   input CYC_I,             /* 总线周期信号 */
-                  output reg INT_O);       /* 中断信号 */
+                  output reg INT_O,
+                  output reg TX_O);       /* 中断信号 */
     
     parameter base_addr = 32'h1250_0000;
     parameter FIFO_SIZE = 8'd32;
@@ -26,8 +27,13 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     reg [7:0] MSR; /* Modem Status Register */
     
     reg [7:0] tx_fifo [0:FIFO_SIZE - 1];
+    reg [7:0] tx_shifting;
     reg [7:0] tx_fifo_head;
     reg [7:0] tx_fifo_tail;
+    reg tx_completed_flag;
+    reg tx_shift_ready_flag;
+    reg [3:0] tx_shift_cnt;
+
     reg [7:0] rx_fifo [0:FIFO_SIZE - 1];
     reg [7:0] rx_fifo_head;
     reg [7:0] rx_fifo_tail;
@@ -51,6 +57,9 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             
             tx_fifo_head <= 0;
             tx_fifo_tail <= 0;
+
+            tx_shift_ready_flag <= 0;
+
             rx_fifo_head <= 0;
             rx_fifo_tail <= 0;
             
@@ -196,11 +205,60 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                 tx_fifo_head <= 0;
                 tx_fifo_tail <= 0;
             end
+
+            if(tx_fifo_head < tx_fifo_tail) begin
+                /* fifo非空 */
+                LSR[5] <= 0;
+                if(tx_completed_flag) begin
+                    tx_shifting <= tx_fifo[tx_fifo_head];
+                    tx_fifo_head <= tx_fifo_head + 1;
+                    tx_shift_ready_flag <= 1;
+                end
+                else begin
+                    tx_shift_ready_flag <= 0;
+                end
+            end
+            else begin
+                LSR[5] <= 1;
+                tx_shift_ready_flag <= 0;
+                tx_fifo_head <= 0;
+                tx_fifo_tail <= 0;
+            end
+
+            
+            
         end
     end
 
-    always @(posedge divided_clk) begin
-        
+    always @(posedge divided_clk or negedge RST_I) begin
+        if(!RST_I) begin
+            tx_completed_flag <= 1;
+            tx_shift_cnt <= 0;
+            TX_O <= 1;
+        end
+        else begin
+            if(tx_shift_ready_flag) begin
+                tx_completed_flag <= 0;
+                tx_shift_cnt <= 8;
+                TX_O <= 0;
+            end
+            else begin
+                if(!tx_completed_flag) begin
+                    if(tx_shift_cnt > 0) begin
+                        TX_O <= tx_shifting[0];
+                        tx_shifting <= {1'b0, tx_shifting[7:1]};
+                    end
+                    else begin
+                        TX_O <= 1;
+                        tx_completed_flag <= 1;
+                    end
+                    tx_shift_cnt <= tx_shift_cnt - 1;
+                end
+                else begin
+                    TX_O <= 1;
+                end
+            end
+        end
     end
     
 endmodule
