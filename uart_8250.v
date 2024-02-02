@@ -82,7 +82,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                             end
                             else begin
                                 /* TODO: 添加进fifo */
-                                if(tx_fifo_tail - 1 == FIFO_SIZE) begin
+                                if(tx_fifo_tail == FIFO_SIZE - 1) begin
                                     /* FIFO已经满了 */
                                     tx_fifo_head <= 0;
                                     tx_fifo_tail <= 1;
@@ -206,23 +206,26 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                 tx_fifo_tail <= 0;
             end
 
+            /* 只要没到头，就往里边搬东西 */
             if(tx_fifo_head < tx_fifo_tail) begin
                 /* fifo非空 */
                 LSR[5] <= 0;
-                if(tx_completed_flag) begin
+                if(tx_completed_flag && !tx_shift_ready_flag) begin
                     tx_shifting <= tx_fifo[tx_fifo_head];
                     tx_fifo_head <= tx_fifo_head + 1;
                     tx_shift_ready_flag <= 1;
                 end
-                else begin
+                if(!tx_completed_flag) begin
                     tx_shift_ready_flag <= 0;
                 end
             end
             else begin
                 LSR[5] <= 1;
                 tx_shift_ready_flag <= 0;
-                tx_fifo_head <= 0;
-                tx_fifo_tail <= 0;
+                if (tx_fifo_tail > 0 && tx_fifo_head > 0) begin
+                    tx_fifo_head <= 0;
+                    tx_fifo_tail <= 0;
+                end
             end
 
             
