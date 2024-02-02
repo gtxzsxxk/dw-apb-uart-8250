@@ -25,10 +25,10 @@ module uart_8250 (input CLK_I,             /* 时钟 */
     reg [7:0] LSR; /* Line Status Register */
     reg [7:0] MSR; /* Modem Status Register */
     
-    reg [7:0] tx_fifo [FIFO_SIZE];
+    reg [7:0] tx_fifo [0:FIFO_SIZE - 1];
     reg [7:0] tx_fifo_head;
     reg [7:0] tx_fifo_tail;
-    reg [7:0] rx_fifo [FIFO_SIZE];
+    reg [7:0] rx_fifo [0:FIFO_SIZE - 1];
     reg [7:0] rx_fifo_head;
     reg [7:0] rx_fifo_tail;
     
