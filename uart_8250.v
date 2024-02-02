@@ -255,6 +255,8 @@ module uart_8250 (input CLK_I,             /* 时钟 */
         end
     end
 
+    /* TODO: the tail becomes 4 and INT_O only hold for one cycle */
+
     always @(posedge divided_clk or negedge RST_I) begin
         if(!RST_I) begin
             tx_completed_flag <= 1;
@@ -264,6 +266,7 @@ module uart_8250 (input CLK_I,             /* 时钟 */
         else begin
             if(tx_shift_ready_flag) begin
                 tx_completed_flag <= 0;
+                tx_shifting <= THR;
                 tx_shift_cnt <= 8;
                 TX_O <= 0;
             end
