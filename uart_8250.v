@@ -73,8 +73,16 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                             end
                             else begin
                                 /* TODO: 添加进fifo */
-                                if()
-                                tx_fifo[tx_fifo_tail + 1] <= DAT_I[7:0];
+                                if(tx_fifo_tail - 1 == FIFO_SIZE) begin
+                                    /* FIFO已经满了 */
+                                    tx_fifo_head <= 0;
+                                    tx_fifo_tail <= 1;
+                                    tx_fifo[0] <= DAT_I[7:0];
+                                end
+                                else begin
+                                    tx_fifo[tx_fifo_tail] <= DAT_I[7:0];
+                                    tx_fifo_tail <= tx_fifo_tail + 1;
+                                end
                             end
                             DAT_O <= 32'bz;
                         end
@@ -189,6 +197,10 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                 tx_fifo_tail <= 0;
             end
         end
+    end
+
+    always @(posedge divided_clk) begin
+        
     end
     
 endmodule
