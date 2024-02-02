@@ -207,7 +207,8 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             end
 
             /* 只要没到头，就往里边搬东西 */
-            if(tx_fifo_head < tx_fifo_tail) begin
+            if(tx_fifo_head < tx_fifo_tail ||
+                (tx_fifo_tail == tx_fifo_head && tx_fifo_head > 0)) begin
                 /* fifo非空 */
                 LSR[5] <= 0;
                 if(tx_completed_flag && !tx_shift_ready_flag) begin
