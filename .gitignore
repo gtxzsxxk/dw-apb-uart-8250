@@ -1,2 +1,5 @@
 wave
 wave.vcd
+uart_vivado/uart_vivado.cache
+uart_vivado/uart_vivado.runs
+uart_vivado/uart_vivado.sim
