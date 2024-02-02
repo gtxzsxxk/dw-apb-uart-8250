@@ -41,6 +41,32 @@ module uart_8250_tst();
         #1 RST_O = 0;
         CYC_O    = 0;
         #1 RST_O = 1;
+
+        /* 换波特率 */
+
+        #1 ADR_O = 32'h1250_0003;
+        DAT_O    = 32'h80;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+
+        #1 ADR_O = 32'h1250_0000;
+        DAT_O    = 32'h03;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
+
+        #1 ADR_O = 32'h1250_0003;
+        DAT_O    = 32'h00;
+        WE_O     = 1;
+        STB_O    = 1;
+        CYC_O    = 1;
+        #1 CLK_O = 1;
+        #1 CLK_O = 0;
         
         /* 测试数据发送 */
 
@@ -70,114 +96,12 @@ module uart_8250_tst();
 
         STB_O    = 0;
         CYC_O    = 0;
+    end
 
+    always 
+    begin
         #1 CLK_O = 1;
         #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-        #1 CLK_O = 1;
-        #1 CLK_O = 0;
-
-        
-        #1 $finish;
     end
     
 endmodule
