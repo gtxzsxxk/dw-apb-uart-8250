@@ -66,11 +66,11 @@ module uart_8250_tst();
         STB_O    = 1;
         CYC_O    = 1;
         #1 CLK_O = 1;
-        #1 CLK_O = 0;
+        #5 CLK_O = 0;
         
         /* 测试数据发送 */
 
-        #1 ADR_O = 32'h1250_0000;
+        ADR_O = 32'h1250_0000;
         DAT_O    = 32'h12;
         WE_O     = 1;
         STB_O    = 1;
@@ -78,7 +78,7 @@ module uart_8250_tst();
         #1 CLK_O = 1;
         #1 CLK_O = 0;
 
-        #1 ADR_O = 32'h1250_0000;
+        ADR_O = 32'h1250_0000;
         DAT_O    = 32'h34;
         WE_O     = 1;
         STB_O    = 1;
@@ -86,7 +86,7 @@ module uart_8250_tst();
         #1 CLK_O = 1;
         #1 CLK_O = 0;
 
-        #1 ADR_O = 32'h1250_0000;
+        ADR_O = 32'h1250_0000;
         DAT_O    = 32'h56;
         WE_O     = 1;
         STB_O    = 1;
