@@ -217,10 +217,12 @@ module uart_8250 (input CLK_I,             /* 时钟 */
             if(FCR[1]) begin
                 rx_fifo_head <= 0;
                 rx_fifo_tail <= 0;
+                FCR[1] <= 0;
             end
             if(FCR[2]) begin
                 tx_fifo_head <= 0;
                 tx_fifo_tail <= 0;
+                FCR[2] <= 0;
             end
 
             /* 只要没到头，就往里边搬东西 */
@@ -243,7 +245,10 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                     tx_fifo_head <= 0;
                     tx_fifo_tail <= 0;
                     LSR[5] <= 1;
-                    intr_tx_fifo_empty <= 1;
+
+                    if (IER[1]) begin
+                        intr_tx_fifo_empty <= 1;
+                    end
                 end
                 else begin
                     LSR[5] <= 0;
