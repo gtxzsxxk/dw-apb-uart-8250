@@ -247,15 +247,12 @@ module uart_8250 (input CLK_I,             /* 时钟 */
                 end
                 else begin
                     LSR[5] <= 0;
-                    intr_tx_fifo_empty <= 0;
                 end
             end
 
             
         end
     end
-
-    /* TODO: the tail becomes 4 and INT_O only hold for one cycle */
 
     always @(posedge divided_clk or negedge RST_I) begin
         if(!RST_I) begin
